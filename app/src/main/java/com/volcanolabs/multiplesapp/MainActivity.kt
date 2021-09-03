@@ -1,20 +1,17 @@
 package com.volcanolabs.multiplesapp
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
 import android.widget.Toast
+import androidx.activity.viewModels
+import androidx.appcompat.app.AppCompatActivity
 import com.volcanolabs.multiplesapp.databinding.ActivityMainBinding
 import dagger.hilt.android.AndroidEntryPoint
-import java.lang.Exception
-import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
-    @Inject
-    lateinit var multiples: Multiples
     private lateinit var binding: ActivityMainBinding
     private lateinit var adapter: MultiplesListAdapter
+    val viewModel: MultiplesViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -27,8 +24,7 @@ class MainActivity : AppCompatActivity() {
             try {
                 val number = numberText.toInt()
                 if (numberText.isNotEmpty() && number > 0) {
-                    val multiples = multiples.calculateMultiples(number)
-                    adapter.setData(multiples)
+                    viewModel.calculateMultiples(number)
                 } else {
                     displayError()
                 }
@@ -37,6 +33,10 @@ class MainActivity : AppCompatActivity() {
             }
 
         }
+
+        viewModel.multiplesObs.observe(this, {
+            adapter.setData(it)
+        })
         setContentView(binding.root)
     }
 
